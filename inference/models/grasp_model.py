@@ -13,40 +13,39 @@ class GraspModel(nn.Module):
     def forward(self, x_in):
         raise NotImplementedError()
 
-    def compute_loss(self, xc, yc):
-        y_pos, y_cos, y_sin, y_width = yc
-        pos_pred, cos_pred, sin_pred, width_pred = self(xc)
+    def compute_loss(self, image, text, yc):
+        y_pos, y_height, y_width, y_theta = yc
+        pos_pred, height_pred, width_pred, theta_pred = self(image, text)
 
         p_loss = F.smooth_l1_loss(pos_pred, y_pos)
-        cos_loss = F.smooth_l1_loss(cos_pred, y_cos)
-        sin_loss = F.smooth_l1_loss(sin_pred, y_sin)
-        width_loss = F.smooth_l1_loss(width_pred, y_width)
+        h_loss = F.smooth_l1_loss(height_pred, y_height)
+        w_loss = F.smooth_l1_loss(width_pred, y_width)
+        theta_loss = F.smooth_l1_loss(theta_pred, y_theta)
 
         return {
-            'loss': p_loss + cos_loss + sin_loss + width_loss,
+            'loss': p_loss + h_loss + w_loss + theta_loss,
             'losses': {
                 'p_loss': p_loss,
-                'cos_loss': cos_loss,
-                'sin_loss': sin_loss,
-                'width_loss': width_loss
+                'h_loss': h_loss,
+                'w_loss': w_loss,
+                'theta_loss': theta_loss
             },
             'pred': {
                 'pos': pos_pred,
-                'cos': cos_pred,
-                'sin': sin_pred,
-                'width': width_pred
+                'height': height_pred,
+                'width': width_pred,
+                'theta': theta_pred
             }
         }
 
     def predict(self, xc):
-        pos_pred, cos_pred, sin_pred, width_pred = self(xc)
+        pos_pred, height_pred, width_pred, theta_pred = self(xc)
         return {
             'pos': pos_pred,
-            'cos': cos_pred,
-            'sin': sin_pred,
-            'width': width_pred
+            'height': height_pred,
+            'width': width_pred,
+            'theta': theta_pred
         }
-
 
 class ResidualBlock(nn.Module):
     """

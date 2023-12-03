@@ -1,0 +1,10 @@
+[16:44:26] {/home/ericnguyen/eric/master_thesis/robotic-grasping/hardware/device.py:11} INFO - CUDA detected. Running with GPU acceleration.
+[16:44:26] {/home/ericnguyen/eric/master_thesis/robotic-grasping/train_network.py:251} INFO - Loading Graspanything Dataset...
+[16:44:26] {/home/ericnguyen/eric/master_thesis/robotic-grasping/train_network.py:253} INFO - Loading /home/ericnguyen/eric/master_thesis/robotic-grasping/new_dataset/ 
+[16:44:29] {/home/ericnguyen/eric/master_thesis/robotic-grasping/train_network.py:261} INFO - Dataset size is 1976
+[16:44:29] {/home/ericnguyen/eric/master_thesis/robotic-grasping/train_network.py:270} INFO - Training size: 1778
+[16:44:29] {/home/ericnguyen/eric/master_thesis/robotic-grasping/train_network.py:271} INFO - Validation size: 198
+[16:44:29] {/home/ericnguyen/eric/master_thesis/robotic-grasping/train_network.py:289} INFO - Done
+[16:44:29] {/home/ericnguyen/eric/master_thesis/robotic-grasping/train_network.py:292} INFO - Loading Network...
+[16:44:29] {/home/ericnguyen/eric/master_thesis/robotic-grasping/train_network.py:303} INFO - Done
+[16:44:29] {/home/ericnguyen/eric/master_thesis/robotic-grasping/train_network.py:322} INFO - Beginning Epoch 00
