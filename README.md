@@ -74,7 +74,7 @@ python train_network.py --dataset graspAnything --dataset-path <Path to Dataset>
 
 The trained network can be evaluated using the `evaluate.py` script.  Run `evaluate.py --help` for a full set of options.
 
-Example for Jacquard dataset:
+Example for Grasp-Anything dataset:
 
 ```bash
 python evaluate.py --network <Path to Trained Network> --dataset graspAnything --dataset-path <Path to Dataset>/new_dataset --iou-eval --use-dropout 0 --input-size 416
