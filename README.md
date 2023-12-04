@@ -41,7 +41,7 @@ If you use this project in your research or wish to refer to the baseline result
 ## Installation
 - Checkout the robotic grasping package
 ```bash
-$ git clone https://github.com/skumra/robotic-grasping.git
+$ git clone https://github.com/Eric-nguyen1402/baseline_model.git
 ```
 
 - Create a virtual environment
@@ -56,62 +56,27 @@ $ source venv/bin/activate
 
 - Install the requirements
 ```bash
-$ cd robotic-grasping
+$ cd baseline_model
 $ pip install -r requirements.txt
 ```
-
-## Datasets
-
-This repository supports both the [Cornell Grasping Dataset](https://www.kaggle.com/oneoneliu/cornell-grasp) and
-[Jacquard Dataset](https://jacquard.liris.cnrs.fr/).
-
-#### Cornell Grasping Dataset
-
-1. Download the and extract [Cornell Grasping Dataset](https://www.kaggle.com/oneoneliu/cornell-grasp). 
-2. Convert the PCD files to depth images by running `python -m utils.dataset_processing.generate_cornell_depth <Path To Dataset>`
-
-#### Jacquard Dataset
-
-1. Download and extract the [Jacquard Dataset](https://jacquard.liris.cnrs.fr/).
-
 
 ## Model Training
 
 A model can be trained using the `train_network.py` script.  Run `train_network.py --help` to see a full list of options.
 
-Example for Cornell dataset:
+Example for Grasp-Anything dataset:
 
 ```bash
-python train_network.py --dataset cornell --dataset-path <Path To Dataset> --description training_cornell
-```
-
-Example for Jacquard dataset:
-
-```bash
-python train_network.py --dataset jacquard --dataset-path <Path To Dataset> --description training_jacquard --use-dropout 0 --input-size 300
+python train_network.py --dataset graspAnything --dataset-path <Path to Dataset>/new_dataset--description training_graspAnything --input-size 416
 ```
 
 ## Model Evaluation
 
 The trained network can be evaluated using the `evaluate.py` script.  Run `evaluate.py --help` for a full set of options.
 
-Example for Cornell dataset:
-
-```bash
-python evaluate.py --network <Path to Trained Network> --dataset cornell --dataset-path <Path to Dataset> --iou-eval
-```
-
 Example for Jacquard dataset:
 
 ```bash
-python evaluate.py --network <Path to Trained Network> --dataset jacquard --dataset-path <Path to Dataset> --iou-eval --use-dropout 0 --input-size 300
+python evaluate.py --network <Path to Trained Network> --dataset graspAnything --dataset-path <Path to Dataset>/new_dataset --iou-eval --use-dropout 0 --input-size 416
 ```
 
-## Run Tasks
-A task can be executed using the relevant run script. All task scripts are named as `run_<task name>.py`. For example, to run the grasp generator run:
-```bash
-python run_grasp_generator.py
-```
-
-## Run on a Robot
-To run the grasp generator with a robot, please use our ROS implementation for Baxter robot. It is available at: https://github.com/skumra/baxter-pnp
