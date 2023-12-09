@@ -28,7 +28,7 @@ class JacquardDataset(GraspDatasetBase):
         if ds_rotate:
             self.grasp_files = self.grasp_files[int(self.length * ds_rotate):] + self.grasp_files[
                                                                                  :int(self.length * ds_rotate)]
-        # change the wildcard name file from 'perfect_depth.tiff' to 'RGB.png' in each file path (e.g, 10_perfect_depth.tiff to 10_RGB.png)
+
         self.depth_files = [f.replace('grasps.txt', 'perfect_depth.tiff') for f in self.grasp_files]
         self.rgb_files = [f.replace('perfect_depth.tiff', 'RGB.png') for f in self.depth_files]
 

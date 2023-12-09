@@ -1,3 +1,0 @@
-[02:48:14] {/home/ericnguyen/eric/master_thesis/robotic-grasping/hardware/device.py:17} INFO - CUDA is *NOT* detected. Running with only CPU.
-[02:48:14] {/home/ericnguyen/eric/master_thesis/robotic-grasping/train_network.py:250} INFO - Loading Graspanything Dataset...
-[02:48:14] {/home/ericnguyen/eric/master_thesis/robotic-grasping/train_network.py:252} INFO - Loading /home/ericnguyen/eric/master_thesis/robotic-grasping/dataset/ 

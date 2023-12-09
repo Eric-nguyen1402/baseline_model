@@ -1,9 +1,0 @@
-[16:52:48] {/home/ericnguyen/eric/master_thesis/robotic-grasping/hardware/device.py:17} INFO - CUDA is *NOT* detected. Running with only CPU.
-[16:52:48] {/home/ericnguyen/eric/master_thesis/robotic-grasping/train_network.py:247} INFO - Loading Graspanything Dataset...
-[16:52:48] {/home/ericnguyen/eric/master_thesis/robotic-grasping/train_network.py:249} INFO - Loading /home/ericnguyen/eric/master_thesis/robotic-grasping/new_dataset/ 
-[16:52:48] {/home/ericnguyen/eric/master_thesis/robotic-grasping/train_network.py:257} INFO - Dataset size is 1976
-[16:52:48] {/home/ericnguyen/eric/master_thesis/robotic-grasping/train_network.py:266} INFO - Training size: 1778
-[16:52:48] {/home/ericnguyen/eric/master_thesis/robotic-grasping/train_network.py:267} INFO - Validation size: 198
-[16:52:48] {/home/ericnguyen/eric/master_thesis/robotic-grasping/train_network.py:285} INFO - Done
-[16:52:48] {/home/ericnguyen/eric/master_thesis/robotic-grasping/train_network.py:288} INFO - Loading Network...
-[16:52:48] {/home/ericnguyen/eric/master_thesis/robotic-grasping/train_network.py:299} INFO - Done

@@ -4,6 +4,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 from imageio import imread
+import imageio
 from skimage.transform import rotate, resize
 
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -24,12 +25,22 @@ class Image:
     @classmethod
     def from_file(cls, fname):
         return cls(imread(fname))
-    
+
     def copy(self):
         """
         :return: Copy of self.
         """
         return self.__class__(self.img.copy())
+    
+    @classmethod
+    def mask_out_image(cls, image, mask):
+        # Apply the mask to the image
+        masked_image = np.array(image)
+        masked_image[:, :, 0] = masked_image[:, :, 0] * mask + 255 * (1-mask)
+        masked_image[:, :, 1] = masked_image[:, :, 1] * mask + 255 * (1-mask)
+        masked_image[:, :, 2] = masked_image[:, :, 2] * mask + 255 * (1-mask)
+
+        return cls(imageio.core.util.Array(masked_image))
 
     def crop(self, top_left, bottom_right, resize=None):
         """

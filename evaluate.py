@@ -34,7 +34,7 @@ def parse_args():
                         help='Use RGB image for evaluation (1/0)')
     parser.add_argument('--augment', action='store_true',
                         help='Whether data augmentation should be applied')
-    parser.add_argument('--split', type=float, default=0.9,
+    parser.add_argument('--split', type=float, default=0.01,
                         help='Fraction of data for training (remainder is validation)')
     parser.add_argument('--ds-shuffle', action='store_true', default=False,
                         help='Shuffle the dataset')
@@ -60,6 +60,8 @@ def parse_args():
                         help='Force code to run in CPU mode')
     parser.add_argument('--random-seed', type=int, default=123,
                         help='Random seed for numpy')
+    parser.add_argument('--seen', type=int, default=1,
+                        help='Flag for using seen classes, only work for Grasp-Anything dataset') 
 
     args = parser.parse_args()
 
@@ -86,7 +88,8 @@ if __name__ == '__main__':
                            random_rotate=args.augment,
                            random_zoom=args.augment,
                            include_depth=args.use_depth,
-                           include_rgb=args.use_rgb)
+                           include_rgb=args.use_rgb,
+                           seen=args.seen)
 
     indices = list(range(test_dataset.length))
     split = int(np.floor(args.split * test_dataset.length))

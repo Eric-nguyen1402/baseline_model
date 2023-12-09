@@ -19,15 +19,13 @@ from inference.post_process import post_process_output
 from utils.data import get_dataset
 from utils.dataset_processing import evaluation
 from utils.visualisation.gridshow import gridshow
-import matplotlib.pyplot as plt
 
-# python train_network.py --dataset graspAnything --dataset-path /home/ericnguyen/eric/master_thesis/robotic-grasping/new_dataset/ --description training_graspAnything --use-dropout 0 --input-size 416
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train network')
 
     # Network
-    parser.add_argument('--network', type=str, default='grconvnet5',
+    parser.add_argument('--network', type=str, default='grconvnet3',
                         help='Network name in inference/models')
     parser.add_argument('--input-size', type=int, default=224,
                         help='Input image size for the network')
@@ -35,6 +33,8 @@ def parse_args():
                         help='Use Depth image for training (1/0)')
     parser.add_argument('--use-rgb', type=int, default=1,
                         help='Use RGB image for training (1/0)')
+    parser.add_argument('--text-size', type=int, default=64,
+                        help='Size of the text features')
     parser.add_argument('--use-dropout', type=int, default=1,
                         help='Use dropout for training (1/0)')
     parser.add_argument('--dropout-prob', type=float, default=0.1,
@@ -43,12 +43,10 @@ def parse_args():
                         help='Internal channel size for the network')
     parser.add_argument('--iou-threshold', type=float, default=0.25,
                         help='Threshold for IOU matching')
-    parser.add_argument('--text-size', type=int, default=64,
-                        help='Size of the text features')
 
     # Datasets
     parser.add_argument('--dataset', type=str,
-                        help='Dataset Name ("cornell" or "jaquard" or "graspAnything")')
+                        help='Dataset Name ("cornell" or "jaquard")')
     parser.add_argument('--dataset-path', type=str,
                         help='Path to dataset')
     parser.add_argument('--split', type=float, default=0.9,
@@ -63,9 +61,9 @@ def parse_args():
     # Training
     parser.add_argument('--batch-size', type=int, default=8,
                         help='Batch size')
-    parser.add_argument('--epochs', type=int, default=10,
+    parser.add_argument('--epochs', type=int, default=50,
                         help='Training epochs')
-    parser.add_argument('--batches-per-epoch', type=int, default=100,
+    parser.add_argument('--batches-per-epoch', type=int, default=1000,
                         help='Batches per Epoch')
     parser.add_argument('--optim', type=str, default='adam',
                         help='Optmizer for the training. (adam or SGD)')
@@ -81,6 +79,8 @@ def parse_args():
                         help='Force code to run in CPU mode')
     parser.add_argument('--random-seed', type=int, default=123,
                         help='Random seed for numpy')
+    parser.add_argument('--seen', type=int, default=1,
+                        help='Flag for using seen classes, only work for Grasp-Anything dataset') 
 
     args = parser.parse_args()
     return args
@@ -168,10 +168,9 @@ def train(epoch, net, device, train_data, optimizer, batches_per_epoch, vis=Fals
             batch_idx += 1
             if batch_idx >= batches_per_epoch:
                 break
-            
+
             xc = x.to(device)
             yc = [yy.to(device) for yy in y]
-            
             lossd = net.compute_loss(xc, yc)
 
             loss = lossd['loss']
@@ -209,7 +208,9 @@ def train(epoch, net, device, train_data, optimizer, batches_per_epoch, vis=Fals
 
     return results
 
+
 def run():
+    torch.multiprocessing.set_start_method('spawn')
     args = parse_args()
 
     # Set-up output directories
@@ -250,14 +251,14 @@ def run():
     # Load Dataset
     logging.info('Loading {} Dataset...'.format(args.dataset.title()))
     Dataset = get_dataset(args.dataset)
-    logging.info('Loading {} '.format(args.dataset_path))
     dataset = Dataset(args.dataset_path,
                       output_size=args.input_size,
                       ds_rotate=args.ds_rotate,
                       random_rotate=True,
                       random_zoom=True,
                       include_depth=args.use_depth,
-                      include_rgb=args.use_rgb)
+                      include_rgb=args.use_rgb,
+                      seen=args.seen)
     logging.info('Dataset size is {}'.format(dataset.length))
 
     # Creating data indices for training and validation splits
@@ -290,8 +291,8 @@ def run():
 
     # Load the network
     logging.info('Loading Network...')
-    input_channels = (3 * args.use_rgb) + args.text_size
-    network = get_network(args.network)
+    input_channels = 1 * args.use_depth + 3 * args.use_rgb + args.text_size
+    network = get_network(args.network) 
     net = network(
         input_channels=input_channels,
         dropout=args.use_dropout,
@@ -309,11 +310,11 @@ def run():
     else:
         raise NotImplementedError('Optimizer {} is not implemented'.format(args.optim))
 
-    # # Print model architecture.
-    # summary(net, [(input_channels, args.input_size, args.input_size),(args.batch_size, args.text_size)])
+    # Print model architecture.
+    # summary(net, (input_channels, args.input_size, args.input_size))
     # f = open(os.path.join(save_folder, 'arch.txt'), 'w')
     # sys.stdout = f
-    # summary(net, [(input_channels, args.input_size, args.input_size),(args.batch_size, args.text_size)])
+    # summary(net, (input_channels, args.input_size, args.input_size))
     # sys.stdout = sys.__stdout__
     # f.close()
 

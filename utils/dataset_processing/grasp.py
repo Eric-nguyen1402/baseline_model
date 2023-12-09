@@ -1,8 +1,8 @@
+import torch
 import matplotlib.pyplot as plt
 import numpy as np
 from skimage.draw import polygon
 from skimage.feature import peak_local_max
-import torch
 
 
 def _gr_text_to_no(l, offset=(0, 0)):
@@ -14,6 +14,12 @@ def _gr_text_to_no(l, offset=(0, 0)):
     """
     x, y = l.split()
     return [int(round(float(y))) - offset[0], int(round(float(x))) - offset[1]]
+
+
+def _grasp_anything_format(grasp: list):
+    _, x, y, w, h, theta = grasp
+    # index based on row, column (y,x), and the Grasp-Anything dataset's angles are flipped around an axis.
+    return Grasp(np.array([y, x]), -theta / 180.0 * np.pi, w, h).as_gr
 
 
 class GraspRectangles:
@@ -87,6 +93,67 @@ class GraspRectangles:
                 except ValueError:
                     # Some files contain weird values.
                     continue
+        
+        return cls(grs)
+
+    @classmethod
+    def load_from_ocid_grasp_file(cls, fname):
+        """
+        Load grasp rectangles from a Cornell dataset grasp file.
+        :param fname: Path to text file.
+        :return: GraspRectangles()
+        """
+        grs = []
+        with open(fname) as f:
+            while True:
+                # Load 4 lines at a time, corners of bounding box.
+                p0 = f.readline()
+                if not p0:
+                    break  # EOF
+                p1, p2, p3 = f.readline(), f.readline(), f.readline()
+                try:
+                    gr = np.array([
+                        _gr_text_to_no(p0),
+                        _gr_text_to_no(p1),
+                        _gr_text_to_no(p2),
+                        _gr_text_to_no(p3)
+                    ])
+
+                    grs.append(GraspRectangle(gr))
+
+                except ValueError:
+                    # Some files contain weird values.
+                    continue
+        
+        return cls(grs)
+
+    @classmethod
+    def load_from_vmrd_file(cls, fname):
+        """
+        Load grasp rectangles from a VMRD dataset grasp file.
+        :param fname: Path to text file.
+        :return: GraspRectangles()
+        """
+        grs = []
+        with open(fname) as f:
+            grasp_lines = f.readlines()
+            for grasp_line in grasp_lines:
+                # x1, y1, x2, y2, x3, y3, x4, y4 = list(map(lambda x: int(round(float(x))), grasp_line.split(' ')[:8]))
+                y1, x1, y2, x2, y3, x3, y4, x4 = list(map(lambda x: int(round(float(x))), grasp_line.split(' ')[:8]))
+                try:
+                    gr = np.array([
+                        [x1, y1],
+                        [x2, y2],
+                        [x3, y3],
+                        [x4, y4],
+                    ])
+
+                    grs.append(GraspRectangle(gr))
+
+                except ValueError:
+                    # Some files contain weird values.
+                    continue
+        
         return cls(grs)
 
     @classmethod
@@ -106,24 +173,28 @@ class GraspRectangles:
         grs = cls(grs)
         grs.scale(scale)
         return grs
-    
+
     @classmethod
-    def load_from_graspAnything_file(cls, fname, scale=1.0):
+    def load_from_grasp_anything_file(cls, fname, scale=1.0):
         """
-        Load grasp rectangles from a graspAnything dataset file.
-        :param fname: Path to file.
-        :param scale: Scale to apply (e.g. if resizing images)
+        Load grasp rectangles from a Grasp-Anything dataset grasp file.
+        :param fname: Path to text file.
         :return: GraspRectangles()
         """
-        grs = []
+        grs = None
         with open(fname, 'rb') as f:
-            for l in torch.load(f, map_location='cpu'):
-                [_, x, y, w, h, theta] = list(map(float, l))
-                grs.append(Grasp(np.array([y, x]), -theta / 180.0 * np.pi, w, h).as_gr)
+            pos_grasps = torch.load(f)
+        # add_fn = fname.replace("positive_grasp", "negative_grasp")
+        # with open(fname, 'rb') as f:
+        #     neg_grasps = torch.load(f)
+        # grasps = torch.cat((pos_grasps, neg_grasps), dim=0).tolist()
+        grasps = pos_grasps.tolist()
+        grs = list(map(lambda x: _grasp_anything_format(x), grasps))
+
         grs = cls(grs)
         grs.scale(scale)
         return grs
-
+    
     def append(self, gr):
         """
         Add a grasp rectangle to this GraspRectangles object
@@ -199,7 +270,7 @@ class GraspRectangles:
         if pad_to:
             if pad_to > len(self.grs):
                 a = np.concatenate((a, np.zeros((pad_to - len(self.grs), 4, 2))))
-        return a.astype(int)
+        return a.astype(np.int)
 
     @property
     def center(self):

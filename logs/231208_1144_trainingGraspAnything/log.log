@@ -1,0 +1,9 @@
+[11:44:39] {/home/ericnguyen/eric/master_thesis/Grasp-Anything/hardware/device.py:11} INFO - CUDA detected. Running with GPU acceleration.
+[11:44:39] {/home/ericnguyen/eric/master_thesis/Grasp-Anything/train_network.py:249} INFO - Loading Grasp-Anything Dataset...
+[11:44:39] {/home/ericnguyen/eric/master_thesis/Grasp-Anything/train_network.py:259} INFO - Dataset size is 51
+[11:44:39] {/home/ericnguyen/eric/master_thesis/Grasp-Anything/train_network.py:268} INFO - Training size: 45
+[11:44:39] {/home/ericnguyen/eric/master_thesis/Grasp-Anything/train_network.py:269} INFO - Validation size: 6
+[11:44:39] {/home/ericnguyen/eric/master_thesis/Grasp-Anything/train_network.py:287} INFO - Done
+[11:44:39] {/home/ericnguyen/eric/master_thesis/Grasp-Anything/train_network.py:290} INFO - Loading Network...
+[11:44:40] {/home/ericnguyen/eric/master_thesis/Grasp-Anything/train_network.py:301} INFO - Done
+[11:44:40] {/home/ericnguyen/eric/master_thesis/Grasp-Anything/train_network.py:320} INFO - Beginning Epoch 00
