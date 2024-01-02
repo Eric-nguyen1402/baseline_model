@@ -12,9 +12,10 @@ class ClipProcessor(nn.Module):
     def __init__(self):
         super(ClipProcessor, self).__init__()
         self.clip_model, _ = clip.load("ViT-B/32", device="cuda")
+        self.image_transform = Compose([Resize((224, 224)), ToTensor(), Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
         # Load pre-trained ResNet-101 model
-        resnet18 = models.resnet18(pretrained=True)
-        self.resnet18 = nn.Sequential(*list(resnet18.children())[:-2])  # Remove last two layers
+        self.resnet101 = models.resnet101(pretrained=True)
+        self.resnet101 = nn.Sequential(*list(self.resnet101.children())[:-2])  # Remove last two layers
 
     @staticmethod
     def numpy_to_torch(s):
@@ -24,18 +25,24 @@ class ClipProcessor(nn.Module):
             return torch.from_numpy(s.astype(np.float32))
         
     def forward(self, text, image):
-        input_image = self.numpy_to_torch(image).unsqueeze(0)
-        x = self.resnet18(input_image)
-        print(x.shape)
+        image_features = self.extract_image_features(image)
+        text_features = self.extract_text_features(text)
+        return image_features, text_features
 
+    def extract_image_features(self, image):
+        
+        image = self.numpy_to_torch(image).unsqueeze(0).to("cuda")
+        # Pass through ResNet-101 model to extract features
+        with torch.no_grad():
+            resnet_output = self.resnet101(image)
+        image_features = resnet_output.squeeze()  # Squeeze to remove batch dimension
+
+        return image_features
+
+    def extract_text_features(self, text):
         text = clip.tokenize([text]).to("cuda")
         text_features = self.clip_model.encode_text(text)
-        print(text_features.shape)
-
-        x = torch.cat((x, text_features), dim=0)
-        print(x.shape)
-
-        return x
+        return text_features
 
 class GraspDatasetBase(torch.utils.data.Dataset):
     """
@@ -125,8 +132,8 @@ class GraspDatasetBase(torch.utils.data.Dataset):
                 )
             )
         elif self.include_rgb and self.include_text:
-            x = self.clip_processor(text, rgb_img)
-           
+            image_features, text_features = self.clip_processor(text, rgb_img)
+            x = torch.cat((image_features, text_features), dim=1)
 
         elif self.include_depth:
             x = self.numpy_to_torch(depth_img)
