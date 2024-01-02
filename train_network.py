@@ -291,7 +291,7 @@ def run():
 
     # Load the network
     logging.info('Loading Network...')
-    input_channels = 1 * args.use_depth + 3 * args.use_rgb + args.text_size
+    input_channels = 1 * args.use_depth + 3 * args.use_rgb
     network = get_network(args.network) 
     net = network(
         input_channels=input_channels,

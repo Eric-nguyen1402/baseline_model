@@ -301,12 +301,12 @@ def run():
     logging.info('Loading Network...')
     input_channels = 1 * args.use_depth + 3 * args.use_rgb
     network = get_network(args.network)
-    # net = network(
-    #     input_channels=input_channels,
-    #     dropout=args.use_dropout,
-    #     prob=args.dropout_prob,
-    #     channel_size=args.channel_size
-    # )
+    net = network(
+        input_channels=input_channels,
+        dropout=args.use_dropout,
+        prob=args.dropout_prob,
+        channel_size=args.channel_size
+    )
 
     net = net.to(device)
     logging.info('Done')
@@ -319,12 +319,12 @@ def run():
         raise NotImplementedError('Optimizer {} is not implemented'.format(args.optim))
 
     # Print model architecture.
-    # summary(net, (input_channels, args.input_size, args.input_size))
-    # f = open(os.path.join(save_folder, 'arch.txt'), 'w')
-    # sys.stdout = f
-    # summary(net, (input_channels, args.input_size, args.input_size))
-    # sys.stdout = sys.__stdout__
-    # f.close()
+    summary(net, (input_channels, args.input_size, args.input_size))
+    f = open(os.path.join(save_folder, 'arch.txt'), 'w')
+    sys.stdout = f
+    summary(net, (input_channels, args.input_size, args.input_size))
+    sys.stdout = sys.__stdout__
+    f.close()
 
     best_iou = 0.0
     for epoch in range(args.epochs):
