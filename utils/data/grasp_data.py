@@ -7,6 +7,7 @@ from torchvision import models
 import torch.nn as nn
 from torchvision.transforms import Compose, Resize, ToTensor, Normalize
 from PIL import Image
+import re
 
 class ClipProcessor(nn.Module):
     def __init__(self):
@@ -23,17 +24,35 @@ class ClipProcessor(nn.Module):
         else:
             return torch.from_numpy(s.astype(np.float32))
         
-    def forward(self, text, image):
+    def forward(self, text_sentences, related_words_list, image):
         input_image = self.numpy_to_torch(image).unsqueeze(0)
         x = self.resnet18(input_image)
         print(x.shape)
 
-        text = clip.tokenize([text]).to("cuda")
-        text_features = self.clip_model.encode_text(text)
-        print(text_features.shape)
+        # Encoding the sentence part of the text
+    
+        # Assuming text_sentences is a list of strings
+        list_of_words = []
+        for sentence in text_sentences:
+            words = sentence.split()
+            list_of_words.extend(words)  # Extending the list with words from each sentence
+        tokenized_sentence = clip.tokenize(list_of_words).to("cuda")
+        sentence_features = self.clip_model.encode_text(tokenized_sentence)
 
-        x = torch.cat((x, text_features.unsqueeze(0)), dim=1)
-        print(x.shape)
+        # Encoding the related words
+        tokenized_related_words = clip.tokenize(related_words_list[0]).to("cuda")
+        related_words_features = self.clip_model.encode_text(tokenized_related_words)
+
+        # Combining features if needed for further processing
+        combined_features = torch.cat((sentence_features, related_words_features), dim=0)
+
+        print(combined_features.shape)
+        # token_text = clip.tokenize([text]).to("cuda")
+        # text_features = self.clip_model.encode_text(token_text)
+        # print(text_features.shape)
+
+        # x = torch.cat((x, text_features.unsqueeze(0)), dim=1)
+        # print(x.shape)
 
         return x
 
@@ -109,6 +128,8 @@ class GraspDatasetBase(torch.utils.data.Dataset):
         # Load the text
         if self.include_text:
             text = self.get_text(idx)
+            text_sentences, related_words_list = self.split_text_tuples(text)
+            
 
         # Load the grasps
         bbs = self.get_gtbb(idx, rot, zoom_factor)
@@ -125,7 +146,7 @@ class GraspDatasetBase(torch.utils.data.Dataset):
                 )
             )
         elif self.include_rgb and self.include_text:
-            x = self.clip_processor(text, rgb_img)
+            x = self.clip_processor(text_sentences, related_words_list, rgb_img)
            
 
         elif self.include_depth:
@@ -142,3 +163,15 @@ class GraspDatasetBase(torch.utils.data.Dataset):
 
     def __len__(self):
         return len(self.grasp_files)
+    
+    def split_text_tuples(self, sentences):
+        text_sentences = []
+        related_words_list = []
+        for i, data in enumerate(sentences):
+            if i % 2 == 0:
+                text_sentences.append(data)
+            else:
+                related_words_list.append(data)
+
+        return text_sentences, related_words_list
+

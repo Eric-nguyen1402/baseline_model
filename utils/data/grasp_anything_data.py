@@ -128,3 +128,5 @@ class GraspAnythingDataset(GraspDatasetBase):
             with open(self.text_files[idx], 'rb', encoding='latin1') as f:
                 text = pickle.load(f)
         return text
+    
+    
