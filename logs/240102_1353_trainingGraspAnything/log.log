@@ -1,9 +1,0 @@
-[13:53:51] {/home/ericnguyen/eric/master_thesis/baseline_model/hardware/device.py:11} INFO - CUDA detected. Running with GPU acceleration.
-[13:53:51] {/home/ericnguyen/eric/master_thesis/baseline_model/train_network.py:252} INFO - Loading Grasp-Anything Dataset...
-[13:53:52] {/home/ericnguyen/eric/master_thesis/baseline_model/train_network.py:262} INFO - Dataset size is 51
-[13:53:52] {/home/ericnguyen/eric/master_thesis/baseline_model/train_network.py:271} INFO - Training size: 45
-[13:53:52] {/home/ericnguyen/eric/master_thesis/baseline_model/train_network.py:272} INFO - Validation size: 6
-[13:53:52] {/home/ericnguyen/eric/master_thesis/baseline_model/train_network.py:290} INFO - Done
-[13:53:52] {/home/ericnguyen/eric/master_thesis/baseline_model/train_network.py:293} INFO - Loading Network...
-[13:53:53] {/home/ericnguyen/eric/master_thesis/baseline_model/train_network.py:304} INFO - Done
-[13:53:53] {/home/ericnguyen/eric/master_thesis/baseline_model/train_network.py:323} INFO - Beginning Epoch 00
