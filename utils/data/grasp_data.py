@@ -46,13 +46,15 @@ class ClipProcessor(nn.Module):
         combined_features = torch.cat((sentence_features, related_words_features), dim=0)
         print('combine',combined_features.shape)
         # Assuming you want to expand along dimension 1 (the second dimension)
-        combined_features = combined_features.unsqueeze(0)  # Add a new dimension
+        # Reshape x to match the first dimension of y
+        x_expanded = x.expand(combined_features.shape[0], -1, -1, -1)
 
-        # Expand combined_features to match the size of x along the specific dimension
-        combined_features = combined_features.expand(-1, x.size(1), -1)  # Adjust dimensions based on your requirement
+        # Concatenate along the 0th dimension
+        concatenated_features = torch.cat((x_expanded.to('cuda:0'), combined_features.unsqueeze(2).unsqueeze(2)), dim=0)
 
+        print(concatenated_features.shape)
         # Now, concatenate tensors along the expanded dimension
-        x = torch.cat((x.to('cuda:0'), combined_features), dim=0)
+        # x = torch.cat((x.to('cuda:0'), combined_features), dim=0)
         # print(x.shape)
 
         return x
