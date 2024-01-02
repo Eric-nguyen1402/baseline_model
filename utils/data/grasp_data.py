@@ -27,7 +27,7 @@ class ClipProcessor(nn.Module):
     def forward(self, text_sentences, related_words_list, image):
         input_image = self.numpy_to_torch(image).unsqueeze(0)
         x = self.resnet18(input_image)
-
+        print('x',x.shape)
         # Encoding the sentence part of the text
     
         # Assuming text_sentences is a list of strings
@@ -44,10 +44,7 @@ class ClipProcessor(nn.Module):
 
         # Combining features if needed for further processing
         combined_features = torch.cat((sentence_features, related_words_features), dim=0)
-
-        # token_text = clip.tokenize([text]).to("cuda")
-        # text_features = self.clip_model.encode_text(token_text)
-        # print(text_features.shape)
+        print('combine',combined_features.shape)
 
         x = torch.cat((x.to('cuda:0'), combined_features.unsqueeze(0)), dim=1)
         # print(x.shape)
