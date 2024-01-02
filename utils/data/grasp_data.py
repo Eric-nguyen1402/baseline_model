@@ -45,8 +45,11 @@ class ClipProcessor(nn.Module):
         # Combining features if needed for further processing
         combined_features = torch.cat((sentence_features, related_words_features), dim=0)
         print('combine',combined_features.shape)
+        # Reshape combined_features before concatenating
+        combined_features = combined_features.unsqueeze(0)  # Assuming you want to add a new dimension at the beginning
 
-        x = torch.cat((x.to('cuda:0'), combined_features.unsqueeze(0)), dim=1)
+        # Now, concatenate tensors along the new dimension
+        x = torch.cat((x.to('cuda:0'), combined_features.expand_as(x)), dim=0)
         # print(x.shape)
 
         return x
