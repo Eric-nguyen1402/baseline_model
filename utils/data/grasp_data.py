@@ -49,7 +49,7 @@ class ClipProcessor(nn.Module):
         # text_features = self.clip_model.encode_text(token_text)
         # print(text_features.shape)
 
-        x = torch.cat((x, combined_features.unsqueeze(0)), dim=1)
+        x = torch.cat((x.to('cuda:0'), combined_features.unsqueeze(0)), dim=1)
         # print(x.shape)
 
         return x
